@@ -9,7 +9,7 @@ public interface IBaseRepository<TEntity> where TEntity : class
 
     Task<TEntity> SaveAsync(TEntity entity);
 
-    Task<TEntity> GetByIdAsync(Guid id);
+    ValueTask<TEntity?> GetByIdAsync(Guid id);
 
     Task RemoveAsync(TEntity entity);
 }

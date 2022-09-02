@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infra.Context;
 
-public class AppContext : DbContext, IAppContext
+public class ChatAppContext : DbContext, IAppContext
 {
-    public AppContext(DbContextOptions options) : base(options)
+    public ChatAppContext(DbContextOptions options) : base(options)
     {
     }
 
