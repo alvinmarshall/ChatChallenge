@@ -1,6 +1,6 @@
+using Bot.Data;
 using Bot.Models;
 using Bot.Options;
-using Bot.Services;
 
 namespace Bot.Clients;
 
@@ -15,7 +15,7 @@ public class StockRestClient : IStockRestClient
         _stockConfigOption = stockConfigOption;
     }
 
-    public async Task<List<Stock>> GetStocks(string stockName)
+    public async Task<List<Stock>> GetStocksAsync(string stockName)
     {
         var cacheList = StockInMemory.GetValueOrDefault(stockName);
         if (cacheList is not null) return cacheList;

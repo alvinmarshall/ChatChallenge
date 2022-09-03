@@ -17,7 +17,7 @@ public class StocksController : Controller
     [HttpGet]
     public  async Task<ActionResult> Index()
     {
-        var stocks = await _restClient.GetStocks("aapl.us");
+        var stocks = await _restClient.GetStocksAsync("aapl.us");
         return Ok(stocks);
     }
 }

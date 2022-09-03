@@ -1,6 +1,7 @@
 using App.Exceptions;
 using Bot.Clients;
 using Bot.Options;
+using Bot.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,7 @@ builder.Services.AddSingleton(provider =>
     return instance;
 });
 builder.Services.AddScoped<IStockRestClient, StockRestClient>();
+builder.Services.AddScoped<IStockService, StockService>();
 builder.Services.AddSingleton<IStockRestClient, StockRestClient>();
 
 var app = builder.Build();

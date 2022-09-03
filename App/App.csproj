@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\BotCommands\BotCommands.csproj" />
       <ProjectReference Include="..\Infra\Infra.csproj" />
     </ItemGroup>
 

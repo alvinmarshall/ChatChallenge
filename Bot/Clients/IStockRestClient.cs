@@ -4,5 +4,5 @@ namespace Bot.Clients;
 
 public interface IStockRestClient
 {
-    Task<List<Stock>> GetStocks(string stockName);
+    Task<List<Stock>> GetStocksAsync(string stockName);
 }

@@ -2,7 +2,7 @@ using System.Globalization;
 using Bot.Models;
 using CsvHelper;
 
-namespace Bot.Services;
+namespace Bot.Data;
 
 public static class ParseStockCsv
 {
