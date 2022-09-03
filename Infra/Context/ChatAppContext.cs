@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infra.Context;
 
-public class ChatAppContext : DbContext, IAppContext
+public class ChatAppContext : DbContext, IChatAppContext
 {
     public ChatAppContext(DbContextOptions options) : base(options)
     {

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infra.Context;
 
-public interface IAppContext
+public interface IChatAppContext
 {
     public DbSet<RoomEntity> Rooms { get; set; }
     public DbSet<UserEntity> Users { get; set; }
