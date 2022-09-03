@@ -4,5 +4,5 @@ public record ChatRoomMessageDto
 {
     public string Message { get; set; }
     public string Secret { get; set; }
-    public string UserId { get; set; }
+    public Guid UserId { get; set; }
 }

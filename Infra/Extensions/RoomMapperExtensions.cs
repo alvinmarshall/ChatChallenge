@@ -9,6 +9,7 @@ public static class RoomMapperExtensions
     {
         return new ChatRoom
         {
+            Id = input.Id,
             Name = input.Name,
             Secret = input.Secret,
             Users = input.Users.ToChatUsers().ToList()
@@ -19,6 +20,7 @@ public static class RoomMapperExtensions
     {
         return new RoomEntity
         {
+            Id = input.Id,
             Name = input.Name,
             Secret = input.Secret,
             Users = input.Users.FromChatUsers().ToList()

@@ -20,9 +20,9 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 
 builder.Services.AddDbContext<ChatAppContext>(options =>
 {
-    var connection = new SqliteConnection("Filename=:memory:");
-    connection.Open();
-    options.UseSqlite(connection);
+    // var connection = new SqliteConnection("Filename=:memory:");
+    // connection.Open();
+    options.UseSqlite("Data source=chat.db");
 });
 builder.Services.AddInfrastructureServices();
 builder.Services.AddScoped<IChatService, ChatService>();
@@ -37,10 +37,15 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<ChatAppContext>();
+    db.Database.EnsureDeleted();
+    db.Database.EnsureCreated();
 }
 
 app.UseHttpsRedirection();
-
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -25,8 +25,19 @@ public class ChatRoomService : IChatRoomService
         {
             message = input.Message,
             CreatedAt = DateTime.UtcNow,
+            User = new ChatUser { Id = input.UserId },
             Room = room
         };
         return await _chatMessageRepository.SaveMessageAsync(chatMessage);
+    }
+
+    public async Task<ChatRoom> AddRoom(CreateRoomDto input)
+    {
+        var room = new ChatRoom
+        {
+            Name = input.Name,
+            Secret = input.Secret
+        };
+        return await _chatRoomRepository.Add(room);
     }
 }

@@ -17,4 +17,10 @@ public class ChatRoomRepository : BaseRepository<RoomEntity>, IChatRoomRepositor
         var roomEntity = await Task.FromResult(Find(entity => entity.Secret == secret).FirstOrDefault());
         return roomEntity?.ToChatRoom();
     }
+
+    public async Task<ChatRoom> Add(ChatRoom input)
+    {
+        var entity = await SaveAsync(input.FromChatRoom());
+        return entity.ToChatRoom();
+    }
 }

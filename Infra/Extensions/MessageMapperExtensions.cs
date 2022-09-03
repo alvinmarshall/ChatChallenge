@@ -9,6 +9,7 @@ public static class MessageMapperExtensions
     {
         return new ChatMessage
         {
+            Id = input.Id,
             message = input.message,
             User = input.UserEntity.ToChatUser(),
             CreatedAt = input.CreatedAt,
@@ -20,6 +21,7 @@ public static class MessageMapperExtensions
     {
         return new MessageEntity
         {
+            Id = input.Id,
             message = input.message,
             UserEntity = input.User.FromChatUser(),
             CreatedAt = input.CreatedAt,
