@@ -26,6 +26,9 @@ builder.Services.AddDbContext<ChatAppContext>(options =>
 });
 builder.Services.AddInfrastructureServices();
 builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<IChatRoomService, ChatRoomService>();
+builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<IMessagingService, MessagingService>();
 
 var app = builder.Build();
 
