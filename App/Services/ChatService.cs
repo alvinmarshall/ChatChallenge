@@ -21,4 +21,9 @@ public class ChatService : IChatService
     {
         return _chatRoomService.AddRoom(input);
     }
+
+    public Task<List<ChatRoom>> GetRooms()
+    {
+        return _chatRoomService.Rooms();
+    }
 }

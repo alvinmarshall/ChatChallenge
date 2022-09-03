@@ -40,4 +40,9 @@ public class ChatRoomService : IChatRoomService
         };
         return await _chatRoomRepository.Add(room);
     }
+
+    public Task<List<ChatRoom>> Rooms()
+    {
+        return _chatRoomRepository.GetRooms();
+    }
 }

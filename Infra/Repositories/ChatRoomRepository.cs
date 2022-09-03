@@ -23,4 +23,10 @@ public class ChatRoomRepository : BaseRepository<RoomEntity>, IChatRoomRepositor
         var entity = await SaveAsync(input.FromChatRoom());
         return entity.ToChatRoom();
     }
+
+    public async Task<List<ChatRoom>> GetRooms()
+    {
+        var entities = await Task.FromResult(GetAll());
+        return entities.ToChatRooms();
+    }
 }

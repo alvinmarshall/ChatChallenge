@@ -6,4 +6,5 @@ public interface IChatRoomRepository
 {
     Task<ChatRoom?> GetBySecreteAsync(string secret);
     Task<ChatRoom> Add(ChatRoom input);
+    Task<List<ChatRoom>> GetRooms();
 }

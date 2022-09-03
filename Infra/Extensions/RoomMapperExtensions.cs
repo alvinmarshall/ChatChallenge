@@ -26,4 +26,14 @@ public static class RoomMapperExtensions
             Users = input.Users.FromChatUsers().ToList()
         };
     }
+
+    public static List<RoomEntity> FromChatRooms(this IEnumerable<ChatRoom> input)
+    {
+        return input.Select(room => room.FromChatRoom()).ToList();
+    }
+
+    public static List<ChatRoom> ToChatRooms(this IEnumerable<RoomEntity> input)
+    {
+        return input.Select(room => room.ToChatRoom()).ToList();
+    }
 }

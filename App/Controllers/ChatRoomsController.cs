@@ -23,10 +23,17 @@ public class ChatRoomsController : Controller
         return Ok(apiResponse);
     }
 
-    [HttpPost("room")]
+    [HttpPost("add")]
     public async Task<ActionResult<ApiResponse<object>>> AddRoom([FromBody] CreateRoomDto input)
     {
         var apiResponse = new ApiResponse<object> { Success = true, Data = await _chatService.AddRoom(input) };
+        return Ok(apiResponse);
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<ApiResponse<object>>> Rooms()
+    {
+        var apiResponse = new ApiResponse<object> { Success = true, Data = await _chatService.GetRooms() };
         return Ok(apiResponse);
     }
 }
