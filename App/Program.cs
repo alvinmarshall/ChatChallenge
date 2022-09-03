@@ -3,7 +3,6 @@ using App.Services;
 using Infra.Config;
 using Infra.Context;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,8 +19,6 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 
 builder.Services.AddDbContext<ChatAppContext>(options =>
 {
-    // var connection = new SqliteConnection("Filename=:memory:");
-    // connection.Open();
     options.UseSqlite("Data source=chat.db");
 });
 builder.Services.AddInfrastructureServices();
@@ -29,6 +26,7 @@ builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IChatRoomService, ChatRoomService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IMessagingService, MessagingService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 

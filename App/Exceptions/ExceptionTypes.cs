@@ -6,7 +6,8 @@
         ServiceDown,
         ServiceBadRequest,
         ServiceTimeout,
-        InternalServerError
+        InternalServerError,
+        UnAuthorize
 
     }
 }

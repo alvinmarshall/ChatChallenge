@@ -72,6 +72,7 @@ namespace App.Exceptions
         {
             return exceptionTypes switch
             {
+                ExceptionTypes.UnAuthorize => (int)HttpStatusCode.Unauthorized,
                 ExceptionTypes.RecordNotFound => (int)HttpStatusCode.NotFound,
                 ExceptionTypes.ServiceDown => (int)HttpStatusCode.ServiceUnavailable,
                 ExceptionTypes.ServiceBadRequest => (int)HttpStatusCode.BadRequest,
