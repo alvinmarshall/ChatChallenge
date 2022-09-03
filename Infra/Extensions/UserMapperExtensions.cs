@@ -22,4 +22,14 @@ public static class UserMapperExtensions
             Name = input.Name
         };
     }
+
+    public static IEnumerable<ChatUser> ToChatUsers(this IEnumerable<UserEntity> input)
+    {
+        return input.Select(entity => entity.ToChatUser());
+    }
+
+    public static IEnumerable<UserEntity> FromChatUsers(this IEnumerable<ChatUser> input)
+    {
+        return input.Select(user => user.FromChatUser());
+    }
 }

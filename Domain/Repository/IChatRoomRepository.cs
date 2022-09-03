@@ -4,5 +4,5 @@ namespace Domain.Repository;
 
 public interface IChatRoomRepository
 {
-    Task<ChatRoom> GetBySecreteAsync(string secret);
+    Task<ChatRoom?> GetBySecreteAsync(string secret);
 }
