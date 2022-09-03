@@ -1,17 +1,22 @@
+using App.Exceptions;
 using App.Services;
 using Infra.Config;
 using Infra.Context;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+// Exception handling
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+        new BadRequestObjectResult(ExceptionConfiguration.HandleValidationExceptionResponse(context));
+});
 
 builder.Services.AddDbContext<ChatAppContext>(options =>
 {
