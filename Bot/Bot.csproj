@@ -7,4 +7,13 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="CsvHelper" Version="28.0.1" />
+      <PackageReference Include="NServiceBus" Version="7.7.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\BotCommands\BotCommands.csproj" />
+    </ItemGroup>
+
 </Project>
