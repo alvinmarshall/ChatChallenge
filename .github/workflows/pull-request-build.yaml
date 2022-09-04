@@ -1,9 +1,9 @@
-name: Run Unit and Integration Test
+name: Run Unit
 
 on:
   pull_request:
     types: [ opened, synchronize, edited ]
-    branches: [ development ]
+    branches: [ master ]
 jobs:
   build:
     runs-on: ubuntu-latest
