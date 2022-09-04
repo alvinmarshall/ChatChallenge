@@ -19,7 +19,7 @@ public class ChatRoomService : IChatRoomService
 
     public async Task<ChatMessage> SaveMessage(ChatRoomMessageDto input)
     {
-        var room = await _chatRoomRepository.GetBySecreteAsync(input.Secret);
+        var room = await GetRoomBySecret(input.Secret);
         if (room is null) throw new RecordNotFoundException("Chat Secret Not Found");
         var chatMessage = new ChatMessage
         {

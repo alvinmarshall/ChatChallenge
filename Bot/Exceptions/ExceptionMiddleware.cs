@@ -3,9 +3,8 @@ using System.Net.Mime;
 using System.Text.Json;
 using App.DTO;
 using Bot.DTO;
-using Bot.Exceptions;
 
-namespace App.Exceptions
+namespace Bot.Exceptions
 {
     public class ExceptionMiddleware
     {

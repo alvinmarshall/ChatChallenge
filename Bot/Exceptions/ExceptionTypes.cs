@@ -1,4 +1,4 @@
-﻿namespace App.Exceptions
+﻿namespace Bot.Exceptions
 {
    public enum ExceptionTypes
     {

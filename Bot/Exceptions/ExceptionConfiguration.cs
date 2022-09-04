@@ -2,7 +2,7 @@ using App.DTO;
 using Bot.DTO;
 using Microsoft.AspNetCore.Mvc;
 
-namespace App.Exceptions;
+namespace Bot.Exceptions;
 
 public static class ExceptionConfiguration
 {

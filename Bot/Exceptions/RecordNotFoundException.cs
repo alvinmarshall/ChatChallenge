@@ -1,8 +1,6 @@
-﻿
-using Bot.DTO;
-using Bot.Exceptions;
+﻿using Bot.DTO;
 
-namespace App.Exceptions
+namespace Bot.Exceptions
 {
     public class RecordNotFoundException : CustomException
     {

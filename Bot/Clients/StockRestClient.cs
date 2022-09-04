@@ -6,12 +6,14 @@ namespace Bot.Clients;
 
 public class StockRestClient : IStockRestClient
 {
-    private readonly HttpClient _client = new();
+    private readonly HttpClient _client;
     private readonly StockConfigOption _stockConfigOption;
     private static readonly Dictionary<string, List<Stock>> StockInMemory = new();
 
-    public StockRestClient(StockConfigOption stockConfigOption)
+
+    public StockRestClient(HttpClient client, StockConfigOption stockConfigOption)
     {
+        _client = client;
         _stockConfigOption = stockConfigOption;
     }
 
