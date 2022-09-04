@@ -1,7 +1,7 @@
 version: '3'
 services:
   broker:
-    image: rabbitmq:3.8.9-management-alpine
+    image: rabbitmq:management
     ports:
       - "5672:5672"
       - "15672:15672"
