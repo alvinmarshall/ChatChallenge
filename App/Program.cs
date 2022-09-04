@@ -1,3 +1,4 @@
+using App.Config;
 using App.Exceptions;
 using App.Services;
 using Infra.Config;
@@ -21,7 +22,9 @@ builder.Services.AddDbContext<ChatAppContext>(options =>
 {
     options.UseSqlite("Data source=chat.db");
 });
+
 builder.Services.AddInfrastructureServices();
+builder.Services.AddNServiceBus();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IChatRoomService, ChatRoomService>();
 builder.Services.AddScoped<IChatService, ChatService>();
@@ -45,7 +48,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

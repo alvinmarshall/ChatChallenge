@@ -5,7 +5,7 @@ namespace App.Services;
 
 public interface IChatService
 {
-    Task ParseMessage(ChatRoomMessageDto input);
+    Task<ChatRoomHubDto> ParseMessage(ChatRoomMessageDto input);
     Task<ChatRoom> AddRoom(CreateRoomDto input);
     Task<List<ChatRoom>> GetRooms();
 }
