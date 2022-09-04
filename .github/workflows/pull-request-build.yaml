@@ -1,0 +1,13 @@
+name: Run Unit and Integration Test
+
+on:
+  pull_request:
+    types: [ opened, synchronize, edited ]
+    branches: [ development ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Tests
+        run: dotnet test
