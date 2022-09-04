@@ -41,6 +41,13 @@ public class ChatRoomService : IChatRoomService
         return await _chatRoomRepository.Add(room);
     }
 
+    public async Task<ChatRoom> GetRoomBySecret(string secret)
+    {
+        var chatRoom = await _chatRoomRepository.GetBySecreteAsync(secret);
+        if (chatRoom is null) throw new RecordNotFoundException("Chat Secret Not Found");
+        return chatRoom;
+    }
+
     public Task<List<ChatRoom>> Rooms()
     {
         return _chatRoomRepository.GetRooms();
