@@ -5,7 +5,7 @@ namespace App.Exceptions
 {
     public class UserServiceException : CustomException
     {
-        protected UserServiceException(string message) : base(message)
+        public UserServiceException(string message) : base(message)
         {
         }
 

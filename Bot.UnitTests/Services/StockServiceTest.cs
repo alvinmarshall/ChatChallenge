@@ -39,18 +39,13 @@ public class StockServiceTest
     }
 
     [Fact]
-    public void ShouldThrowIfStockCodeIsInvalid()
+    public async void ShouldThrowIfStockCodeIsInvalid()
     {
         _sut = new StockService(_stockRestClientMock.Object);
         var stockCode = "Unknown";
         _stockRestClientMock.Setup(client => client.GetStocksAsync(stockCode))
             .ReturnsAsync(() => throw new CustomException("something wrong"));
-
-        _sut.Invoking(service =>
-            service.GetStockByCodeAsync(It.IsAny<string>())
-                .Should()
-        );
-        Action act = () => _sut.GetStockByCodeAsync(stockCode);
-        act.Should().Throw<CustomException>();
+        var act = () => _sut.GetStockByCodeAsync(stockCode);
+       await act.Should().ThrowAsync<CustomException>();
     }
 }
