@@ -1,0 +1,13 @@
+name: Run Unit
+
+on:
+  pull_request:
+    types: [ opened, synchronize, edited ]
+    branches: [ master ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Tests
+        run: dotnet test
