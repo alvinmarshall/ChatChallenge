@@ -19,7 +19,7 @@ public class SendStockCommandHandler : IHandleMessages<SendStockCommand>
         var stock = stocks.FirstOrDefault();
         var botMessage = stock is null
             ? $"{message.Stock} quote not found"
-            : $"{message.Stock} quote is {stock?.Open} per share";
+            : $"{message.Stock} quote is {stock.Open} per share";
 
         var command = new GetStockCommand
         {

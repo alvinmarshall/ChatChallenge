@@ -21,6 +21,7 @@ builder.Services.AddSingleton<IStockRestClient, StockRestClient>();
 
 var app = builder.Build();
 
-app.MapControllers();
 app.UseMiddleware<ExceptionMiddleware>();
+app.MapControllers();
+app.UseNServiceBusInstance();
 app.Run();

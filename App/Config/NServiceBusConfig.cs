@@ -1,3 +1,5 @@
+using App.Options;
+using BotCommands.Commands;
 using NServiceBus;
 using Endpoint = NServiceBus.Endpoint;
 
@@ -9,14 +11,31 @@ public static class NServiceBusConfig
     {
         services.AddSingleton<IMessageSession>(provider =>
         {
-            var endpointConfiguration = new EndpointConfiguration("Chat");
-            var transport = endpointConfiguration.UseTransport<RabbitMQTransport>();
             var configuration = provider.GetRequiredService<IConfiguration>();
-            transport.ConnectionString(configuration["RabbitMq:Connection"]);
-            transport.UseConventionalRoutingTopology(QueueType.Quorum);
+            var configOptions = configuration.GetSection(NServiceBusConfigOptions.SectionName)
+                .Get<NServiceBusConfigOptions>();
+            var endpointConfiguration = new EndpointConfiguration(configOptions.ChatEndpoint);
+            endpointConfiguration.UseSerialization<NewtonsoftJsonSerializer>();
+            endpointConfiguration.EnableInstallers();
+
+            var transport = endpointConfiguration.UseTransport<RabbitMQTransport>();
+            transport.ConnectionString(configOptions.TransportConnection);
+
+            transport.UseDirectRoutingTopology(QueueType.Quorum);
+
+            transport
+                .Routing()
+                .RouteToEndpoint(typeof(SendStockCommand), configOptions.SendStockCommandDestination);
+
             return Endpoint.Start(endpointConfiguration)
                 .GetAwaiter()
                 .GetResult();
         });
+    }
+
+    public static void UseNServiceBusInstance(this IApplicationBuilder app)
+    {
+        using var scope = app.ApplicationServices.CreateScope();
+        scope.ServiceProvider.GetRequiredService<IMessageSession>();
     }
 }

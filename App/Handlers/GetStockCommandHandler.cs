@@ -1,22 +1,14 @@
 using App.DTO;
-using App.Hubs;
 using BotCommands.Commands;
-using Microsoft.AspNetCore.SignalR;
 using NServiceBus;
 
 namespace App.Handlers;
 
 public class GetStockCommandHandler : IHandleMessages<GetStockCommand>
 {
-    private readonly IHubContext<ChatHub> _context;
-
-    public GetStockCommandHandler(IHubContext<ChatHub> context)
+    public Task Handle(GetStockCommand message, IMessageHandlerContext context)
     {
-        _context = context;
-    }
-
-    public async Task Handle(GetStockCommand message, IMessageHandlerContext context)
-    {
+        Console.WriteLine("Received-Message: {0}", message);
         var hubDto = new ChatRoomHubDto()
         {
             Message = message.Message,
@@ -24,6 +16,7 @@ public class GetStockCommandHandler : IHandleMessages<GetStockCommand>
             ChatRoomId = message.ChatRoomId,
             CreatedAt = message.CreatedAt
         };
-        await _context.Clients.Group(message.ChatRoomId.ToString()).SendAsync(ChatHub.ON_MESSAGE_RECEIVED, hubDto);
+        Console.WriteLine("message: {0}", hubDto);
+        return Task.CompletedTask;
     }
 }
