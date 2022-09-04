@@ -16,7 +16,6 @@ builder.Services.AddSingleton(provider =>
 });
 builder.Services.AddHttpClient<StockService>();
 builder.Services.AddNServiceBus();
-builder.Services.AddScoped<IStockRestClient, StockRestClient>();
 builder.Services.AddScoped<IStockService, StockService>();
 builder.Services.AddSingleton<IStockRestClient, StockRestClient>();
 
