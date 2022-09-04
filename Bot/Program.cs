@@ -1,6 +1,6 @@
-using App.Exceptions;
 using Bot.Clients;
 using Bot.Config;
+using Bot.Exceptions;
 using Bot.Options;
 using Bot.Services;
 
@@ -14,6 +14,7 @@ builder.Services.AddSingleton(provider =>
     requiredService.Bind(StockConfigOption.SectionName, instance);
     return instance;
 });
+builder.Services.AddHttpClient<StockService>();
 builder.Services.AddNServiceBus();
 builder.Services.AddScoped<IStockRestClient, StockRestClient>();
 builder.Services.AddScoped<IStockService, StockService>();

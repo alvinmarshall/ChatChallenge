@@ -1,7 +1,4 @@
-﻿
-
-using App.Exceptions;
-using Bot.DTO;
+﻿using Bot.DTO;
 
 namespace Bot.Exceptions
 {
@@ -11,7 +8,7 @@ namespace Bot.Exceptions
         public string? ReferenceId { get; }
         public List<ApiError> Errors { get; }
 
-        protected CustomException(string message) : base(message)
+        public CustomException(string message) : base(message)
         {
             ExceptionTypes = ExceptionTypes.ServiceBadRequest;
             var error = new ApiError
