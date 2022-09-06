@@ -1,14 +1,17 @@
 using App.Options;
 using BotCommands.Commands;
 using NServiceBus;
+using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using Endpoint = NServiceBus.Endpoint;
 
 namespace App.Config;
 
 public static class NServiceBusConfig
 {
-    public static void AddNServiceBus(this IServiceCollection services)
+    public static IServiceProvider AddNServiceBus(this IServiceCollection services)
     {
+        UpdateableServiceProvider container = null;
+
         services.AddSingleton<IMessageSession>(provider =>
         {
             var configuration = provider.GetRequiredService<IConfiguration>();
@@ -16,6 +19,15 @@ public static class NServiceBusConfig
                 .Get<NServiceBusConfigOptions>();
             var endpointConfiguration = new EndpointConfiguration(configOptions.ChatEndpoint);
             endpointConfiguration.UseSerialization<NewtonsoftJsonSerializer>();
+            endpointConfiguration.UseContainer<ServicesBuilder>(customizations =>
+            {
+                customizations.ExistingServices(services);
+                customizations.ServiceProviderFactory(sc => 
+                {
+                    container = new UpdateableServiceProvider(sc);
+                    return container;
+                });
+            });
             endpointConfiguration.EnableInstallers();
 
             var transport = endpointConfiguration.UseTransport<RabbitMQTransport>();
@@ -31,6 +43,7 @@ public static class NServiceBusConfig
                 .GetAwaiter()
                 .GetResult();
         });
+        return container;
     }
 
     public static void UseNServiceBusInstance(this IApplicationBuilder app)
