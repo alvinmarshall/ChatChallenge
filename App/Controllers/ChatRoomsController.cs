@@ -36,4 +36,11 @@ public class ChatRoomsController : Controller
         var apiResponse = new ApiResponse<object> { Success = true, Data = await _chatService.GetRooms() };
         return Ok(apiResponse);
     }
+
+    [HttpGet("{roomId}/messages")]
+    public async Task<ActionResult<ApiResponse<object>>> GetRoomMessages(Guid roomId)
+    {
+        var apiResponse = new ApiResponse<object> { Success = true, Data = await _chatService.GetRoomMessages(roomId) };
+        return Ok(apiResponse);
+    }
 }
