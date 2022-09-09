@@ -10,6 +10,7 @@ namespace App.UnitTests;
 public class ChatServiceTest
 {
     private readonly Mock<IChatRoomService> _chatRoomServiceMock = new();
+    private readonly Mock<IMessageService> _messageServiceMock = new();
     private readonly Mock<IMessageSession> _messageSessionMock = new();
     private ChatService? _sut;
 
@@ -25,7 +26,7 @@ public class ChatServiceTest
             .ReturnsAsync(() => new ChatRoom { Id = roomId, Name = roomName, Secret = roomSecret });
 
 
-        _sut = new ChatService(_chatRoomServiceMock.Object, _messageSessionMock.Object);
+        _sut = new ChatService(_chatRoomServiceMock.Object, _messageServiceMock.Object, _messageSessionMock.Object);
         var messageDto = new ChatRoomMessageDto()
         {
             Message = "/stock=AAPL.US",
@@ -49,7 +50,7 @@ public class ChatServiceTest
             .ReturnsAsync(() => new ChatRoom { Id = roomId, Name = roomName, Secret = roomSecret });
 
 
-        _sut = new ChatService(_chatRoomServiceMock.Object, _messageSessionMock.Object);
+        _sut = new ChatService(_chatRoomServiceMock.Object, _messageServiceMock.Object, _messageSessionMock.Object);
         var messageDto = new ChatRoomMessageDto()
         {
             Message = "/stock",
@@ -85,7 +86,7 @@ public class ChatServiceTest
                 User = new ChatUser { Id = userId, Name = userName }
             });
 
-        _sut = new ChatService(_chatRoomServiceMock.Object, _messageSessionMock.Object);
+        _sut = new ChatService(_chatRoomServiceMock.Object, _messageServiceMock.Object, _messageSessionMock.Object);
         var messageDto = new ChatRoomMessageDto()
         {
             Message = "Test-Message",

@@ -28,4 +28,14 @@ public static class MessageMapperExtensions
             Room = input.Room.FromChatRoom()
         };
     }
+
+    public static List<ChatMessage> ToChatMessages(this IEnumerable<MessageEntity> input)
+    {
+        return input.Select(entity => entity.ToChatMessage()).ToList();
+    }
+
+    public static List<MessageEntity> FromChatMessage(this IEnumerable<ChatMessage> input)
+    {
+        return input.Select(message => message.FromChatMessage()).ToList();
+    }
 }

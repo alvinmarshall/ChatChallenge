@@ -10,12 +10,19 @@ namespace App.Services;
 public class ChatService : IChatService
 {
     private readonly IChatRoomService _chatRoomService;
+
+    private readonly IMessageService _messageService;
     private readonly IMessageSession _messageSession;
 
 
-    public ChatService(IChatRoomService chatRoomService, IMessageSession messageSession)
+    public ChatService(
+        IChatRoomService chatRoomService,
+        IMessageService messageService,
+        IMessageSession messageSession
+        )
     {
         _chatRoomService = chatRoomService;
+        _messageService = messageService;
         _messageSession = messageSession;
     }
 
@@ -42,6 +49,11 @@ public class ChatService : IChatService
     public Task<List<ChatRoom>> GetRooms()
     {
         return _chatRoomService.Rooms();
+    }
+
+    public Task<List<ChatMessage>> GetRoomMessages(Guid id)
+    {
+        return _messageService.GetRoomMessages(id);
     }
 
     private async Task<ChatRoomHubDto> PerformBotAction(string message, Guid chatRoomId)

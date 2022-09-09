@@ -27,7 +27,7 @@ builder.Services.AddNServiceBus();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IChatRoomService, ChatRoomService>();
 builder.Services.AddScoped<IChatService, ChatService>();
-builder.Services.AddScoped<IMessagingService, MessagingService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddSignalR();
 builder.Services.AddResponseCompression(options =>
@@ -48,13 +48,12 @@ if (app.Environment.IsDevelopment())
     db.Database.EnsureCreated();
 }
 
-
 app.UseHttpsRedirection();
 app.UseMiddleware<ExceptionMiddleware>();
+app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
 app.UseNServiceBusInstance();
-app.UseRouting();
 app.UseEndpoints(routeBuilder =>
 {
     routeBuilder.MapHub<ChatHub>("/chathub");
