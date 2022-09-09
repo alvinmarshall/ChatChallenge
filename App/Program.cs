@@ -44,7 +44,7 @@ if (app.Environment.IsDevelopment())
 
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<ChatAppContext>();
-    // db.Database.EnsureDeleted();
+    db.Database.EnsureDeleted();
     db.Database.EnsureCreated();
 }
 
@@ -53,7 +53,7 @@ app.UseMiddleware<ExceptionMiddleware>();
 app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
-// app.UseNServiceBusInstance();
+app.UseNServiceBusInstance();
 app.UseEndpoints(routeBuilder =>
 {
     routeBuilder.MapHub<ChatHub>("/chathub");
