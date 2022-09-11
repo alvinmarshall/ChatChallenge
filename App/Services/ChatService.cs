@@ -28,7 +28,7 @@ public class ChatService : IChatService
 
     public async Task<ChatRoomHubDto> ParseMessage(ChatRoomMessageDto input)
     {
-        var chatRoom = await _chatRoomService.GetRoomBySecret(input.Secret);
+        var chatRoom = await _chatRoomService.GetRoomById(input.RoomId);
         if (input.Message.Contains("/stock")) return await PerformBotAction(input.Message, chatRoom.Id);
         var chatMessage = await _chatRoomService.SaveMessage(input);
         return new ChatRoomHubDto()

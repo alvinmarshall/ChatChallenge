@@ -14,15 +14,15 @@ public class ChatHub : Hub
         _chatService = chatService;
     }
 
-    public async Task SendMessage(string chatRoomSecret, Guid userId, string message)
+    public async Task SendMessage(Guid roomId, Guid userId, string message)
     {
         var messageDto = new ChatRoomMessageDto
         {
             Message = message,
-            Secret = chatRoomSecret,
+            RoomId = roomId,
             UserId = userId
         };
         var hubDto = await _chatService.ParseMessage(messageDto);
-        await Clients.Group(chatRoomSecret).SendAsync(ON_MESSAGE_RECEIVED, hubDto);
+        await Clients.Group(roomId.ToString()).SendAsync(ON_MESSAGE_RECEIVED, hubDto);
     }
 }

@@ -6,4 +6,5 @@ namespace Infra.Entities;
 public class UserEntity : BaseEntity
 {
     [Column(name: "name")] public string Name { get; set; }
+    public ICollection<RoomEntity> Rooms { get; set; } = Enumerable.Empty<RoomEntity>().ToList();
 }

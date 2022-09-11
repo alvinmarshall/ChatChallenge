@@ -29,7 +29,7 @@ public class UsersController : Controller
     [HttpPost("login")]
     public async Task<ActionResult<ApiResponse<object>>> Login([FromBody] LoginDto input)
     {
-        var apiResponse = new ApiResponse<object>()
+        var apiResponse = new ApiResponse<object>
         {
             Success = true,
             Data = await _userService.Login(input)

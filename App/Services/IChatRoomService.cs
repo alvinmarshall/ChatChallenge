@@ -7,6 +7,6 @@ public interface IChatRoomService
 {
     Task<ChatMessage> SaveMessage(ChatRoomMessageDto input);
     Task<ChatRoom> AddRoom(CreateRoomDto input);
-    Task<ChatRoom> GetRoomBySecret(string secret);
+    Task<ChatRoom> GetRoomById(Guid Id);
     Task<List<ChatRoom>> Rooms();
 }

@@ -14,7 +14,7 @@ public interface IBaseRepository<TEntity> where TEntity : class
     
     Task<TEntity> AddAsync(TEntity entity);
 
-    ValueTask<TEntity?> GetByIdAsync(Guid id);
+    Task<TEntity?> GetByIdAsync(Guid id);
 
     Task<TEntity?> GetByIdAsync(Guid id, IBaseSpecification<TEntity> specification);
 

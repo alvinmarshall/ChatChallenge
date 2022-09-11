@@ -1,14 +1,23 @@
+using App.Auth;
 using App.Config;
 using App.Exceptions;
 using App.Hubs;
 using App.Services;
 using Infra.Config;
 using Infra.Context;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<ProtectedSessionStorage>();
+builder.Services.AddAuthenticationCore();
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
+builder.Services.AddScoped<AuthenticationStateProvider, SimpleAuthenticationStateProvider>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -44,20 +53,19 @@ if (app.Environment.IsDevelopment())
 
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<ChatAppContext>();
-    db.Database.EnsureDeleted();
+    // db.Database.EnsureDeleted();
     db.Database.EnsureCreated();
 }
 
-app.UseHttpsRedirection();
-app.UseMiddleware<ExceptionMiddleware>();
+app.UseStaticFiles();
 app.UseRouting();
+app.UseHttpsRedirection();
+app.MapBlazorHub();
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
-app.UseNServiceBusInstance();
-app.UseEndpoints(routeBuilder =>
-{
-    routeBuilder.MapHub<ChatHub>("/chathub");
-});
-
+// app.UseNServiceBusInstance();
+app.UseEndpoints(routeBuilder => { routeBuilder.MapHub<ChatHub>("/chathub"); });
+app.MapFallbackToPage("/_Host");
 
 app.Run();

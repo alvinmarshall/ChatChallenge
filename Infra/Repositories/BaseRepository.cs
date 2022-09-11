@@ -3,7 +3,6 @@ using Domain.Repository;
 using Domain.Specification;
 using Infra.Context;
 using Infra.Entities;
-using Infra.Specifications;
 using Infra.Specifications.Base;
 using Microsoft.EntityFrameworkCore;
 
@@ -60,9 +59,9 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
         return entity1;
     }
 
-    public ValueTask<TEntity?> GetByIdAsync(Guid id)
+    public Task<TEntity?> GetByIdAsync(Guid id)
     {
-        return Context.Set<TEntity>().FindAsync(id);
+        return Context.Set<TEntity>().AsNoTracking().Where(entity => entity.Id == id).FirstOrDefaultAsync();
     }
 
     public Task<TEntity?> GetByIdAsync(Guid id, IBaseSpecification<TEntity> specification)

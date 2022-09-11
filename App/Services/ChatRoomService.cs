@@ -19,7 +19,7 @@ public class ChatRoomService : IChatRoomService
 
     public async Task<ChatMessage> SaveMessage(ChatRoomMessageDto input)
     {
-        var room = await GetRoomBySecret(input.Secret);
+        var room = await GetRoomById(input.RoomId);
         if (room is null) throw new RecordNotFoundException("Chat Secret Not Found");
         var chatMessage = new ChatMessage
         {
@@ -36,14 +36,15 @@ public class ChatRoomService : IChatRoomService
         var room = new ChatRoom
         {
             Name = input.Name,
-            Secret = input.Secret
+            Secret = input.Secret,
+            Users = input.Users
         };
         return await _chatRoomRepository.Add(room);
     }
 
-    public async Task<ChatRoom> GetRoomBySecret(string secret)
+    public async Task<ChatRoom> GetRoomById(Guid Id)
     {
-        var chatRoom = await _chatRoomRepository.GetBySecreteAsync(secret);
+        var chatRoom = await _chatRoomRepository.GetRoom(Id);
         if (chatRoom is null) throw new RecordNotFoundException("Chat Secret Not Found");
         return chatRoom;
     }
