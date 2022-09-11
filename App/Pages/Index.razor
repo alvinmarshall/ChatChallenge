@@ -1,0 +1,56 @@
+﻿@page "/"
+@using global::App.Services
+@using Domain.Model
+@using global::App.Auth
+@inject IUserService UserService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Index</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        <h1>Welcome Back, @_chatUser?.Name</h1>
+        <button class="btn btn-outline-primary" @onclick="NavigateToChatRoom">ChatRoom</button>
+    </Authorized>
+    <NotAuthorized>
+        <h>Hello, Guest</h>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code
+{
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+
+    private ChatUser? _chatUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authenticationStateProvider = (SimpleAuthenticationStateProvider)AuthenticationStateProvider;
+        try
+        {
+            if (AuthenticationState is not null)
+            {
+                var state = await AuthenticationState;
+                var identityName = state.User.Identity?.Name;
+                if (identityName is not null)
+                {
+                    _chatUser = await UserService.GetUser(Guid.Parse(identityName));
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            await authenticationStateProvider.UpdateAuthenticationState(null);
+            NavigationManager.NavigateTo("/", true);
+        }
+    }
+
+    private void NavigateToChatRoom()
+    {
+        NavigationManager.NavigateTo("/mychatroom");
+    }
+}

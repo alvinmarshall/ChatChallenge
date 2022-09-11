@@ -1,0 +1,94 @@
+@page "/mychatroom/room/{id}"
+@using global::App.Services
+@using Domain.Model
+@inject IChatRoomService _chatRoomService
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IMessageService _messageService
+@inject IUserService UserService
+<div class="container overflow-auto shadow-sm p-3 mb-5 bg-white rounded" style="height: 500px;">
+    @if (_chatMessages == null)
+    {
+        <p>No messages yet, start chatting!</p>
+    }
+
+    @foreach (var chatMessage in _chatMessages)
+    {
+    
+        <div class="row mb-3 d-flex @(chatMessage.User.Id == _chatUser.Id  ? "justify-content-end" : "")">
+            <div class="card shadow @(chatMessage.User.Id == _chatUser.Id ? "color-green mr-5" : "ml-5")" style="width: 18rem;">
+                <div class="card-header">
+                    @(chatMessage.User.Id == _chatUser.Id ? "You" : chatMessage.User.Name)
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item @(chatMessage.User.Id == _chatUser.Id ? "text-green" : "")">@chatMessage.message</li>
+                </ul>
+                <div class="card-footer">
+                    <span class="small">@chatMessage.CreatedAt.ToString("HH:mm | MMM dd")</span>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-3">
+            <input @bind="_chatUser.Name" type="text" class="form-control" placeholder="Your name" readonly="@isUserReadonly"/>
+        </div>
+        <div class="col-6">
+            <textarea @bind="_roomInput.Message" class="form-control" placeholder="Start typing..."></textarea>
+        </div>
+        <div class="col-3">
+            <button type="button" @onclick="Send" class="btn btn-primary">Send</button>
+        </div>
+    </div>
+</div>
+
+
+@code
+{
+    [Parameter]
+    public string? id { get; set; }
+    private bool isUserReadonly = false;
+    private List<ChatMessage>? _chatMessages = new();
+    private readonly RoomInput _roomInput = new();
+    private ChatUser _chatUser = new();
+
+    private class RoomInput
+    {
+        public string Message { get; set; }
+    }
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (id is not null)
+        {
+            _chatMessages = await _messageService.GetRoomMessages(Guid.Parse(id));
+            
+        }
+        if (AuthenticationState is not null)
+        {
+            var state = await AuthenticationState;
+            var identityName = state.User.Identity?.Name;
+            if (identityName is not null)
+            {
+                _chatUser = await UserService.GetUser(Guid.Parse(identityName));
+            }
+        }
+    }
+
+    private async Task Send()
+    {
+        if (!string.IsNullOrEmpty(_roomInput.Message))
+        {
+            isUserReadonly = true;
+        }
+    }
+
+
+}

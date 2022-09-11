@@ -1,0 +1,90 @@
+﻿@page "/mychatroom"
+@using global::App.Services
+@using Domain.Model
+@attribute [Authorize(Roles = "User")]	
+
+@inject NavigationManager _navigationManager
+@inject IChatRoomService _chatRoomService
+<PageTitle>Available Rooms</PageTitle>
+
+
+<div class="card">
+    <div class="card-header container-fluid">
+        <div class="row">
+            <div class="col-md-11">Rooms</div>
+            <div class="col-md-1 float-end">
+                <buttton class="btn btn-outline-primary" @onclick="NavigateToCreateRoom">Create</buttton>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Users</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var chatRoom in _chatRoomsList)
+            {
+                <tr>
+                    <td>
+                        <a href="/mychatroom/room/@chatRoom.Id">@chatRoom.Name</a>
+                    </td>
+                    <td>@chatRoom.Users.Count</td>
+                    @if (isCurrentUser)
+                    {
+                        <td>
+                            <button class="btn btn-outline-danger">Leave</button>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            <button disabled="@isCurrentUser" class="btn btn-outline-primary">Join</button>
+                        </td>
+                    }
+
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+@code {
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+
+    private List<ChatRoom> _chatRoomsList;
+    private bool isCurrentUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _chatRoomsList = await _chatRoomService.Rooms();
+        if (AuthenticationState is not  null)
+        {
+            var state = await AuthenticationState;
+            var identityName = state.User.Identity?.Name;
+            _chatRoomsList.ForEach(room =>
+            {
+                var roomUsers = room.Users;
+                var chatUser = roomUsers.FirstOrDefault(user => user.Id == Guid.Parse(identityName!));
+                if (chatUser is not null)
+                {
+                    isCurrentUser = true;
+                }
+            });
+        }
+    }
+
+    private void NavigateToCreateRoom()
+    {
+        _navigationManager.NavigateTo("/mychatroom/create");
+    }
+
+}
