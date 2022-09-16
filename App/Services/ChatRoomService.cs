@@ -50,6 +50,11 @@ public class ChatRoomService : IChatRoomService
         return await _chatRoomRepository.Update(input);
     }
 
+    public Task Leave(ChatRoom chatRoom)
+    {
+        return _chatRoomRepository.RemoveUser(chatRoom);
+    }
+
     public async Task<ChatRoom> GetRoomById(Guid Id)
     {
         var chatRoom = await _chatRoomRepository.GetRoom(Id);

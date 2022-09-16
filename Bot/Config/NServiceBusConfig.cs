@@ -9,7 +9,7 @@ public static class NServiceBusConfig
 {
     public static IServiceProvider AddNServiceBus(this IServiceCollection services)
     {
-        UpdateableServiceProvider container = null;
+        UpdateableServiceProvider container = new UpdateableServiceProvider(services);
 
         services.AddSingleton<IMessageSession>(provider =>
         {
