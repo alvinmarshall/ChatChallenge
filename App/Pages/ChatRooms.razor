@@ -42,7 +42,7 @@
                     @if (_currentUser.TryGetValue(chatRoom.Id, out _))
                     {
                         <td>
-                            <button class="btn btn-outline-danger">Leave</button>
+                            <button class="btn btn-outline-danger" @onclick="() => Leave(chatRoom)">Leave</button>
                         </td>
                     }
                     else
@@ -101,6 +101,26 @@
     private void NavigateToCreateRoom()
     {
         NavigationManager.NavigateTo("/mychatroom/create");
+    }
+
+    private async void Leave(ChatRoom chatRoom)
+    {
+        if (_chatUser is null) return;
+        var users = chatRoom.Users.ToList().FindAll(user => user.Id == _chatUser.Id);
+        chatRoom.Users = users;
+        await ChatRoomService.Leave(chatRoom);
+        var message = $"{_chatUser.Name} Left";
+        if (IsConnected)
+        {
+            if (_hubConnection is not null)
+            {
+                await _hubConnection.SendAsync(
+                    "SendMessage",
+                    chatRoom.Id,
+                    _chatUser.Id,
+                    message);
+            }
+        }
     }
 
     private async void Join(ChatRoom chatRoom)

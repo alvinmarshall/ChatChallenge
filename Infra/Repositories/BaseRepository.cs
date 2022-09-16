@@ -64,6 +64,7 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
     {
         var entity1 = Context.Set<TEntity>().Update(entity).Entity;
         await Context.SaveChangesAsync();
+        Context.ChangeTracker.Clear();
         return entity1;
     }
 
