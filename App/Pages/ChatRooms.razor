@@ -1,10 +1,15 @@
 ﻿@page "/mychatroom"
-@using global::App.Services
-@using Domain.Model
 @attribute [Authorize(Roles = "User")]	
 
-@inject NavigationManager _navigationManager
-@inject IChatRoomService _chatRoomService
+@inject NavigationManager NavigationManager
+@inject IChatRoomService ChatRoomService
+@inject IUserService UserService
+@using Microsoft.AspNetCore.SignalR.Client
+@using global::App.Services
+@using Domain.Model
+@implements IAsyncDisposable
+
+
 <PageTitle>Available Rooms</PageTitle>
 
 
@@ -34,7 +39,7 @@
                         <a href="/mychatroom/room/@chatRoom.Id">@chatRoom.Name</a>
                     </td>
                     <td>@chatRoom.Users.Count</td>
-                    @if (isCurrentUser)
+                    @if (_currentUser.TryGetValue(chatRoom.Id, out _))
                     {
                         <td>
                             <button class="btn btn-outline-danger">Leave</button>
@@ -43,7 +48,7 @@
                     else
                     {
                         <td>
-                            <button disabled="@isCurrentUser" class="btn btn-outline-primary">Join</button>
+                            <button @onclick="() => Join(chatRoom)" class="btn btn-outline-primary">Join</button>
                         </td>
                     }
 
@@ -60,31 +65,72 @@
     [CascadingParameter]
     private Task<AuthenticationState>? AuthenticationState { get; set; }
 
-    private List<ChatRoom> _chatRoomsList;
-    private bool isCurrentUser;
+    private List<ChatRoom> _chatRoomsList = new();
+    private ChatUser? _chatUser;
+    private HubConnection? _hubConnection;
+    private bool IsConnected => _hubConnection?.State == HubConnectionState.Connected;
+    private readonly Dictionary<Guid, bool> _currentUser = new();
+
 
     protected override async Task OnInitializedAsync()
     {
-        _chatRoomsList = await _chatRoomService.Rooms();
+        _chatRoomsList = await ChatRoomService.Rooms();
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+            .Build();
+        await _hubConnection.StartAsync();
+
         if (AuthenticationState is not  null)
         {
             var state = await AuthenticationState;
             var identityName = state.User.Identity?.Name;
+            ChatUser? chatUser;
             _chatRoomsList.ForEach(room =>
             {
                 var roomUsers = room.Users;
-                var chatUser = roomUsers.FirstOrDefault(user => user.Id == Guid.Parse(identityName!));
+                chatUser = roomUsers.FirstOrDefault(user => user.Id == Guid.Parse(identityName!));
                 if (chatUser is not null)
                 {
-                    isCurrentUser = true;
+                    _currentUser[room.Id] = true;
                 }
             });
+            _chatUser = await UserService.GetUser(Guid.Parse(identityName!));
         }
     }
 
     private void NavigateToCreateRoom()
     {
-        _navigationManager.NavigateTo("/mychatroom/create");
+        NavigationManager.NavigateTo("/mychatroom/create");
+    }
+
+    private async void Join(ChatRoom chatRoom)
+    {
+        if (_chatUser is null) return;
+        var users = chatRoom.Users;
+        users.Add(new ChatUser() { Id = _chatUser.Id });
+        chatRoom.Users = new List<ChatUser>() { _chatUser };
+        await ChatRoomService.JoinRoom(chatRoom);
+        var message = $"{_chatUser.Name} Joined";
+        if (IsConnected)
+        {
+            if (_hubConnection is not null)
+            {
+                await _hubConnection.SendAsync(
+                    "SendMessage",
+                    chatRoom.Id,
+                    _chatUser.Id,
+                    message);
+            }
+        }
+        NavigationManager.NavigateTo($"/mychatroom/room/{chatRoom.Id}");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_hubConnection is not null)
+        {
+            await _hubConnection.DisposeAsync();
+        }
     }
 
 }

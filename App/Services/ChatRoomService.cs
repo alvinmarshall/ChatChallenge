@@ -10,7 +10,9 @@ public class ChatRoomService : IChatRoomService
     private readonly IChatRoomRepository _chatRoomRepository;
     private readonly IChatMessageRepository _chatMessageRepository;
 
-    public ChatRoomService(IChatRoomRepository chatRoomRepository, IChatMessageRepository chatMessageRepository)
+    public ChatRoomService(
+        IChatRoomRepository chatRoomRepository,
+        IChatMessageRepository chatMessageRepository)
     {
         _chatRoomRepository = chatRoomRepository;
         _chatMessageRepository = chatMessageRepository;
@@ -28,6 +30,7 @@ public class ChatRoomService : IChatRoomService
             User = new ChatUser { Id = input.UserId },
             Room = room
         };
+        if (input.IsBot) return chatMessage;
         return await _chatMessageRepository.SaveMessageAsync(chatMessage);
     }
 
@@ -40,6 +43,11 @@ public class ChatRoomService : IChatRoomService
             Users = input.Users
         };
         return await _chatRoomRepository.Add(room);
+    }
+
+    public async Task<ChatRoom> JoinRoom(ChatRoom input)
+    {
+        return await _chatRoomRepository.Update(input);
     }
 
     public async Task<ChatRoom> GetRoomById(Guid Id)

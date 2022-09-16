@@ -26,7 +26,8 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
     public IEnumerable<TEntity> GetAll(IBaseSpecification<TEntity>? specification)
     {
         return SpecificationExecutor<TEntity>
-            .GetQuery(Context.Set<TEntity>().AsNoTracking().AsQueryable(), specification)
+            .GetQuery(Context.Set<TEntity>().AsQueryable(), specification)
+            .AsNoTracking()
             .ToList();
     }
 
@@ -55,6 +56,13 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
     public async Task<TEntity> AddAsync(TEntity entity)
     {
         var entity1 = Context.Set<TEntity>().Attach(entity).Entity;
+        await Context.SaveChangesAsync();
+        return entity1;
+    }
+
+    public async Task<TEntity> UpdateAsync(TEntity entity)
+    {
+        var entity1 = Context.Set<TEntity>().Update(entity).Entity;
         await Context.SaveChangesAsync();
         return entity1;
     }

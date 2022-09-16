@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,7 @@ builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddAuthenticationCore();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddSignalR();
 builder.Services.AddScoped<AuthenticationStateProvider, SimpleAuthenticationStateProvider>();
 
 builder.Services.AddControllers();
@@ -38,7 +40,6 @@ builder.Services.AddScoped<IChatRoomService, ChatRoomService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddSignalR();
 builder.Services.AddResponseCompression(options =>
 {
     options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
@@ -60,12 +61,17 @@ if (app.Environment.IsDevelopment())
 app.UseStaticFiles();
 app.UseRouting();
 app.UseHttpsRedirection();
-app.MapBlazorHub();
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthorization();
+app.MapBlazorHub();
+// app.UseEndpoints(routes =>
+// {
+//     routes.MapHub<ChatHub>("/chathub");
+// });
 app.MapControllers();
-// app.UseNServiceBusInstance();
-app.UseEndpoints(routeBuilder => { routeBuilder.MapHub<ChatHub>("/chathub"); });
+app.UseNServiceBusInstance();
+app.MapHub<ChatHub>("/chathub");
 app.MapFallbackToPage("/_Host");
+
 
 app.Run();

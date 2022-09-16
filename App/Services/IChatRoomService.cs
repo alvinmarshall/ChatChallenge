@@ -9,4 +9,5 @@ public interface IChatRoomService
     Task<ChatRoom> AddRoom(CreateRoomDto input);
     Task<ChatRoom> GetRoomById(Guid Id);
     Task<List<ChatRoom>> Rooms();
+    Task<ChatRoom> JoinRoom(ChatRoom input);
 }

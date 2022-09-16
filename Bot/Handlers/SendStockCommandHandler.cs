@@ -1,4 +1,5 @@
 using Bot.Services;
+using BotCommands;
 using BotCommands.Commands;
 using NServiceBus;
 
@@ -24,6 +25,7 @@ public class SendStockCommandHandler : IHandleMessages<SendStockCommand>
         var command = new GetStockCommand
         {
             Sender = "bot",
+            SenderId = BotInfo.BotId,
             Message = botMessage,
             ChatRoomId = message.ChatRoomId,
             CreatedAt = DateTime.UtcNow

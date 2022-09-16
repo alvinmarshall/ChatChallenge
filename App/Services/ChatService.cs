@@ -19,7 +19,7 @@ public class ChatService : IChatService
         IChatRoomService chatRoomService,
         IMessageService messageService,
         IMessageSession messageSession
-        )
+    )
     {
         _chatRoomService = chatRoomService;
         _messageService = messageService;
@@ -31,11 +31,11 @@ public class ChatService : IChatService
         var chatRoom = await _chatRoomService.GetRoomById(input.RoomId);
         if (input.Message.Contains("/stock")) return await PerformBotAction(input.Message, chatRoom.Id);
         var chatMessage = await _chatRoomService.SaveMessage(input);
-        return new ChatRoomHubDto()
+        return new ChatRoomHubDto
         {
             Message = chatMessage.message,
             Sender = chatMessage.User.Name,
-            SenderId = chatMessage.Id,
+            SenderId = chatMessage.User.Id,
             CreatedAt = chatMessage.CreatedAt,
             ChatRoomId = chatMessage.Room.Id
         };
@@ -63,7 +63,7 @@ public class ChatService : IChatService
             Sender = BotInfo.BotName,
             SenderId = BotInfo.BotId,
             CreatedAt = DateTime.UtcNow,
-            ChatRoomId = chatRoomId
+            ChatRoomId = chatRoomId,
         };
         try
         {
@@ -72,7 +72,7 @@ public class ChatService : IChatService
             {
                 Id = Guid.NewGuid().ToString(),
                 Stock = stockCode,
-                ChatRoomId = chatRoomId
+                ChatRoomId = chatRoomId,
             };
             await _messageSession.Send(command);
             hubDto.Message = "...";

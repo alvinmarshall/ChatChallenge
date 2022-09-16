@@ -1,30 +1,32 @@
 using App.DTO;
-using App.Services;
+using App.Hubs;
 using BotCommands.Commands;
+using Microsoft.AspNetCore.SignalR;
 using NServiceBus;
 
 namespace App.Handlers;
 
 public class GetStockCommandHandler : IHandleMessages<GetStockCommand>
 {
-    private readonly IChatRoomService _roomService;
+    private readonly IHubContext<ChatHub> _hubContext;
 
-    public GetStockCommandHandler(IChatRoomService roomService)
+
+    public GetStockCommandHandler(IHubContext<ChatHub> hubContext)
     {
-        _roomService = roomService;
+        _hubContext = hubContext;
     }
 
-    public Task Handle(GetStockCommand message, IMessageHandlerContext context)
+    public async Task Handle(GetStockCommand message, IMessageHandlerContext context)
     {
-        Console.WriteLine("Received-Message: {0}", message);
-        var hubDto = new ChatRoomHubDto()
+        var hubDto = new ChatRoomMessageDto
         {
             Message = message.Message,
-            Sender = message.Sender,
-            ChatRoomId = message.ChatRoomId,
-            CreatedAt = message.CreatedAt
+            RoomId = message.ChatRoomId,
+            UserId = message.SenderId,
+            IsBot = true
         };
-        Console.WriteLine("message: {0}", hubDto);
-        return Task.CompletedTask;
+        await _hubContext.Clients.Group(hubDto.RoomId.ToString()).SendAsync(ChatHub.RoomMessageMethod, hubDto);
+        await _hubContext.Clients.All.SendAsync(ChatHub.RoomMessageMethod, hubDto);
+        Console.WriteLine($"sent-Message: {hubDto.Message}");
     }
 }
