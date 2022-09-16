@@ -40,3 +40,16 @@ Deliverables
 ---
 When you finish the assignment, send a zip file (don’t forget to include the .git/ folder.) or upload your project to your Git repo (Github, BitBucket, etc... and share the repository link with your initial contact via email. Indicate which, if any, of the bonus tasks you completed.
 If you didn’t manage to finish everything, please tell us which parts you completed.
+
+## App Screenshots
+|              Register              |              Login              |
+|:----------------------------------:|:-------------------------------:|
+| ![screenshot](./Docs/register.png) | ![screenshot](./Docs/login.png) |
+
+|              Welcome              |              Rooms              |
+|:---------------------------------:|:-------------------------------:|
+| ![screenshot](./Docs/welcome.png) | ![screenshot](./Docs/rooms.png) |
+
+|           Room Chat            |           Room Chat Group            |
+|:------------------------------:|:------------------------------------:|
+| ![screenshot](./Docs/chat.png) | ![screenshot](./Docs/chat_group.png) |
