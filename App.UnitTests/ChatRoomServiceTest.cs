@@ -21,7 +21,7 @@ public class ChatRoomServiceTest
         var userId = Guid.Parse("9788A3CD-752A-4D69-A77F-494F5C917A6A");
         var roomId = Guid.Parse("4397830B-E229-4FB5-8376-92278D360F08");
         var message = "Test-Message";
-        _chatRoomRepositoryMock.Setup(repository => repository.GetBySecreteAsync(secret))
+        _chatRoomRepositoryMock.Setup(repository => repository.GetRoom(roomId))
             .ReturnsAsync(() => new ChatRoom { Id = roomId, Name = "Test-Room", Secret = secret });
         _chatMessageRepositoryMock.Setup(repository => repository.SaveMessageAsync(It.IsAny<ChatMessage>()))
             .ReturnsAsync(() => new ChatMessage
@@ -36,7 +36,7 @@ public class ChatRoomServiceTest
         _sut = new ChatRoomService(_chatRoomRepositoryMock.Object, _chatMessageRepositoryMock.Object);
         var messageDto = new ChatRoomMessageDto
         {
-            Secret = secret,
+            RoomId = roomId,
             UserId = userId,
             Message = message
         };
@@ -48,15 +48,15 @@ public class ChatRoomServiceTest
     [Fact]
     public async void ShouldNotSaveMessageAndThrowIfRoomSecretIsInvalid()
     {
-        var secret = "unknown";
+        var roomId = Guid.NewGuid();
         var userId = Guid.Parse("9788A3CD-752A-4D69-A77F-494F5C917A6A");
-        _chatRoomRepositoryMock.Setup(repository => repository.GetBySecreteAsync(secret))
+        _chatRoomRepositoryMock.Setup(repository => repository.GetRoom(roomId))
             .ReturnsAsync(() => null);
 
         _sut = new ChatRoomService(_chatRoomRepositoryMock.Object, _chatMessageRepositoryMock.Object);
         var messageDto = new ChatRoomMessageDto
         {
-            Secret = secret,
+            RoomId = roomId,
             UserId = userId,
             Message = "Test-Message"
         };
@@ -80,31 +80,31 @@ public class ChatRoomServiceTest
     }
 
     [Fact]
-    public async void ShouldGetRoomBySecret()
+    public async void ShouldGetRoomById()
     {
         var secret = "secret";
         var roomName = "Test-Room";
         var roomId = Guid.Parse("4397830B-E229-4FB5-8376-92278D360F08");
-        _chatRoomRepositoryMock.Setup(repository => repository.GetBySecreteAsync(secret))
+        _chatRoomRepositoryMock.Setup(repository => repository.GetRoom(roomId))
             .ReturnsAsync(() => new ChatRoom { Id = roomId, Name = roomName, Secret = secret });
 
         _sut = new ChatRoomService(_chatRoomRepositoryMock.Object, _chatMessageRepositoryMock.Object);
 
-        var chatRoom = await _sut.GetRoomBySecret(secret);
+        var chatRoom = await _sut.GetRoomById(roomId);
         chatRoom.Id.Should().NotBeEmpty();
         chatRoom.Secret.Should().Be(secret);
     }
 
     [Fact]
-    public async void ShouldThrowIfChatRoomSecretIsInvalid()
+    public async void ShouldThrowIfChatRoomIdIsInvalid()
     {
-        var secret = "unknown";
-        _chatRoomRepositoryMock.Setup(repository => repository.GetBySecreteAsync(secret))
+        var roomId = Guid.NewGuid();
+        _chatRoomRepositoryMock.Setup(repository => repository.GetRoom(roomId))
             .ReturnsAsync(() => null);
 
         _sut = new ChatRoomService(_chatRoomRepositoryMock.Object, _chatMessageRepositoryMock.Object);
 
-        var task = () => _sut.GetRoomBySecret(secret);
+        var task = () => _sut.GetRoomById(roomId);
         await task.Should().ThrowAsync<RecordNotFoundException>();
     }
 

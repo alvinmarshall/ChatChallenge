@@ -1,0 +1,146 @@
+@page "/mychatroom/room/{id}"
+@attribute [Authorize(Roles = "User")]	
+
+@inject NavigationManager NavigationManager
+@inject IMessageService MessageService
+@inject IUserService UserService
+@using Microsoft.AspNetCore.SignalR.Client
+@using global::App.Services
+@using global::App.DTO
+@using Domain.Model
+@using global::App.Hubs
+@implements IAsyncDisposable
+
+<div class="container overflow-auto shadow-sm p-3 mb-5 bg-white rounded" style="height: 500px;">
+    @if (_chatMessages == null)
+    {
+        <p>No messages yet, start chatting!</p>
+    }
+
+    @foreach (var chatMessage in _chatMessages)
+    {
+        <div class="row mb-3 d-flex @(chatMessage.CurrentUser ? "justify-content-end" : "")">
+            <div class="card shadow @(chatMessage.CurrentUser ? "color-green mr-5" : "ml-5")" style="width: 18rem;">
+                <div class="card-header">
+                    @(chatMessage.CurrentUser ? "You" : chatMessage.User.Name)
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item @(chatMessage.CurrentUser ? "text-green" : "")">@chatMessage.Message</li>
+                </ul>
+                <div class="card-footer">
+                    <span class="small">@chatMessage.CreatedAt.ToString("HH:mm | MMM dd")</span>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-3">
+            <input @bind="_chatUser.Name" type="text" class="form-control" placeholder="Your name" readonly="@_isUserReadonly"/>
+        </div>
+        <div class="col-6">
+            <textarea @bind="_roomInput.Message" class="form-control" placeholder="Start typing..."></textarea>
+        </div>
+        <div class="col-3">
+            <button type="button" @onclick="Send" disabled="@(!IsConnected)" class="btn btn-primary">Send</button>
+        </div>
+    </div>
+</div>
+
+
+@code
+{
+    [Parameter]
+    public string? id { get; set; }
+
+    private HubConnection? _hubConnection;
+
+    public bool IsConnected => _hubConnection.State == HubConnectionState.Connected;
+
+    private bool _isUserReadonly;
+    private List<RoomMessageDto> _chatMessages = new();
+    private readonly RoomInput _roomInput = new();
+    private ChatUser _chatUser = new();
+
+    private class RoomInput
+    {
+        public string Message { get; set; }
+    }
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+            .WithAutomaticReconnect()
+            .Build();
+        await _hubConnection.StartAsync();
+        if (id is not null)
+        {
+            var roomMessages = await MessageService.GetRoomMessages(Guid.Parse(id));
+            if (AuthenticationState is not null)
+            {
+                var state = await AuthenticationState;
+                var identityName = state.User.Identity?.Name;
+                if (identityName is not null)
+                {
+                    _chatUser = await UserService.GetUser(Guid.Parse(identityName));
+                }
+            }
+            _chatMessages = roomMessages.Select(message => new RoomMessageDto
+            {
+                Message = message.message,
+                CreatedAt = message.CreatedAt,
+                CurrentUser = message.User.Id == _chatUser.Id,
+                RoomId = message.Room.Id,
+                User = message.User
+            }).ToList();
+        }
+
+        _hubConnection.On(ChatHub.RoomMessageMethod, (ChatRoomHubDto dto) =>
+        {
+            Console.WriteLine("Received-message {0}", dto);
+            _chatMessages.Add(new RoomMessageDto
+            {
+                Message = dto.Message,
+                CreatedAt = dto.CreatedAt,
+                RoomId = dto.ChatRoomId,
+                User = new ChatUser { Id = dto.SenderId, Name = dto.Sender },
+                CurrentUser = _chatUser.Id == dto.SenderId
+            });
+
+            StateHasChanged();
+        });
+
+        if (IsConnected)
+        {
+            await _hubConnection.InvokeAsync(ChatHub.JoinGroupMethod, id);
+        }
+    }
+
+    private async Task Send()
+    {
+        if (!string.IsNullOrEmpty(_roomInput.Message))
+        {
+            await _hubConnection?.InvokeAsync(ChatHub.SendMessageMethod,
+                id,
+                _chatUser.Id,
+                _roomInput.Message)!;
+            _roomInput.Message = string.Empty;
+            _isUserReadonly = true;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_hubConnection is not null)
+        {
+            await _hubConnection.DisposeAsync();
+        }
+    }
+
+}

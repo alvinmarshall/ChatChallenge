@@ -3,7 +3,6 @@ using Domain.Repository;
 using Domain.Specification;
 using Infra.Context;
 using Infra.Entities;
-using Infra.Specifications;
 using Infra.Specifications.Base;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,7 +26,8 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
     public IEnumerable<TEntity> GetAll(IBaseSpecification<TEntity>? specification)
     {
         return SpecificationExecutor<TEntity>
-            .GetQuery(Context.Set<TEntity>().AsNoTracking().AsQueryable(), specification)
+            .GetQuery(Context.Set<TEntity>().AsQueryable(), specification)
+            .AsNoTracking()
             .ToList();
     }
 
@@ -60,9 +60,16 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
         return entity1;
     }
 
-    public ValueTask<TEntity?> GetByIdAsync(Guid id)
+    public async Task<TEntity> UpdateAsync(TEntity entity)
     {
-        return Context.Set<TEntity>().FindAsync(id);
+        var entity1 = Context.Set<TEntity>().Update(entity).Entity;
+        await Context.SaveChangesAsync();
+        return entity1;
+    }
+
+    public Task<TEntity?> GetByIdAsync(Guid id)
+    {
+        return Context.Set<TEntity>().AsNoTracking().Where(entity => entity.Id == id).FirstOrDefaultAsync();
     }
 
     public Task<TEntity?> GetByIdAsync(Guid id, IBaseSpecification<TEntity> specification)

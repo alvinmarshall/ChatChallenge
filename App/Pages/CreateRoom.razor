@@ -1,0 +1,83 @@
+@page "/mychatroom/create"
+@using global::App.Services
+@using global::App.DTO
+@using Domain.Model
+@inject IChatRoomService ChatRoomService
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+
+<div class="container">
+    <div class="row" xmlns="http://www.w3.org/1999/html">
+        <div class="col-lg-4 offset-lg-4 pt-4 pb-4 border">
+
+            <div class="mb-3 text-center">
+                <h3>Create Room</h3>
+            </div>
+
+            <div class="mb-3">
+                <div class="form-group">
+                    <input @bind="_roomForm.Name" class="form-control" placeholder="Name">
+
+                    <input @bind="_roomForm.Secret" class="mt-2 form-control" placeholder="Secret">
+                </div>
+
+            </div>
+
+            <div class="mb-3 d-grid gap-2">
+                <button @onclick="Create" class="btn btn-success">Add</button>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+
+@code
+{
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+
+    private readonly RoomForm _roomForm = new();
+
+    private class RoomForm
+    {
+        public string? Name { get; set; }
+        public string? Secret { get; set; }
+    }
+
+    private async Task Create()
+    {
+        if (string.IsNullOrEmpty(_roomForm.Name))
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Provide a Name");
+            return;
+        }
+        if (string.IsNullOrEmpty(_roomForm.Secret))
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Provide a Secret");
+            return;
+        }
+        try
+        {
+            if (AuthenticationState is not null)
+            {
+                var state = await AuthenticationState;
+                var identityName = state.User.Identity?.Name;
+                var createRoomDto = new CreateRoomDto
+                {
+                    Name = _roomForm.Name,
+                    Secret = _roomForm.Secret,
+                    Users = new List<ChatUser>(new[] { new ChatUser { Id = Guid.Parse(identityName!) } })
+                };
+                await ChatRoomService.AddRoom(createRoomDto);
+                NavigationManager.NavigateTo("/mychatroom");
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            await JsRuntime.InvokeVoidAsync("alert", "Unable to perform action");
+        }
+    }
+}

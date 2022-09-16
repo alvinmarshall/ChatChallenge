@@ -1,0 +1,67 @@
+@page "/register"
+@using global::App.Services
+@using global::App.DTO
+@using global::App.Exceptions
+@using global::App.Auth
+@inject IJSRuntime JsRuntime
+@inject IUserService UserService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+
+<div class="row">
+    <div class="col-lg-4 offset-lg-4 pt-4 pb-4 border">
+
+        <div class="mb-3 text-center">
+            <h3>Register</h3>
+        </div>
+
+        <div class="mb-3">
+            <input @bind="_registerForm.Username" class="form-control" placeholder="Username">
+        </div>
+
+        <div class="mb-3 d-grid gap-2">
+            <button @onclick="RegisterUser" class="btn btn-success">Create Account</button>
+        </div>
+
+
+    </div>
+</div>
+
+
+@code
+{
+    private readonly RegisterForm _registerForm = new();
+
+    public class RegisterForm
+    {
+        public string? Username;
+    }
+
+
+    private async Task RegisterUser()
+    {
+        if (string.IsNullOrEmpty(_registerForm.Username))
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "provide a username");
+            return;
+        }
+        try
+        {
+            var chatUser = await UserService.register(new CreateUserDto { Name = _registerForm.Username! });
+            var authenticationProvider = (SimpleAuthenticationStateProvider)AuthenticationStateProvider;
+            await authenticationProvider.UpdateAuthenticationState(new UserSession { Id = chatUser.Id });
+            NavigationManager.NavigateTo("/", true);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            if (e is not UserServiceException)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Unable to perform action");
+                return;
+            }
+            await JsRuntime.InvokeVoidAsync("alert", e.Message);
+        }
+    }
+}

@@ -1,0 +1,65 @@
+@page "/login"
+@using global::App.Services
+@using global::App.DTO
+@using global::App.Exceptions
+@using global::App.Auth
+@inject IUserService UserService
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<div class="row">
+    <div class="col-lg-4 offset-lg-4 pt-4 pb-4 border">
+
+        <div class="mb-3 text-center">
+            <h3>Login</h3>
+        </div>
+
+        <div class="mb-3">
+            <input @bind="_loginForm.Username" class="form-control" placeholder="Username">
+        </div>
+
+        <div class="mb-3 d-grid gap-2">
+            <button @onclick="Authenticate" class="btn btn-primary">Login</button>
+        </div>
+
+
+    </div>
+</div>
+
+
+@code
+{
+    private readonly LoginForm _loginForm = new();
+
+    private class LoginForm
+    {
+        public string? Username { get; set; }
+    }
+
+    private async Task Authenticate()
+    {
+        if (string.IsNullOrEmpty(_loginForm.Username))
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Provide a username");
+            return;
+        }
+        try
+        {
+            var chatUser = await UserService.Login(new LoginDto { Name = _loginForm.Username! });
+            var authenticationProvider = (SimpleAuthenticationStateProvider)AuthenticationStateProvider;
+            await authenticationProvider.UpdateAuthenticationState(new UserSession { Id = chatUser.Id });
+            NavigationManager.NavigateTo("/", true);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            if (e is not UserServiceException)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Unable to perform action");
+                return;
+            }
+            await JsRuntime.InvokeVoidAsync("alert", e.Message);
+        }
+    }
+}

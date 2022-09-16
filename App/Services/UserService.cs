@@ -29,4 +29,11 @@ public class UserService : IUserService
         if (chatUser is null) throw new UserServiceException("UnAuthorize", ExceptionTypes.UnAuthorize);
         return chatUser;
     }
+
+    public async Task<ChatUser> GetUser(Guid id)
+    {
+        var chatUser = await _userRepository.GetUser(id);
+        if (chatUser is null) throw new UserServiceException("user not found", ExceptionTypes.UnAuthorize);
+        return chatUser;
+    }
 }

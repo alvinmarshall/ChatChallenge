@@ -14,7 +14,7 @@ public static class SpecificationExecutor<TEntity> where TEntity : class
         }
 
         query = specification.Includes
-            .Aggregate(query, (entities, expression) => entities.Include(expression));
+            .Aggregate(query, (entities, expression) => entities.Include(expression).AsNoTracking());
 
         if (specification.OrderBy is not null)
         {

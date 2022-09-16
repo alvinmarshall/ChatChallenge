@@ -1,0 +1,73 @@
+﻿@using global::App.Services
+@using global::App.Auth
+@inherits LayoutComponentBase
+@inject NavigationManager _navigationManager
+@inject AuthenticationStateProvider _authenticationStateProvider
+@inject IUserService UserService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+<PageTitle>App</PageTitle>
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu/>
+    </div>
+
+    <main>
+        <div class="top-row px-4 auth">
+            @* <LoginDisplay/> *@
+            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+            <AuthorizeView>
+                <Authorized>
+                    <a @onclick="Logout" href="javascript:void(0)">Logout</a>
+                </Authorized>
+                <NotAuthorized>
+                    <a href="/login">Login</a>
+                    <a href="/register">Register</a>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authenticationStateProvider = (SimpleAuthenticationStateProvider)AuthenticationStateProvider;
+        try
+        {
+            if (AuthenticationState is not null)
+            {
+                var state = await AuthenticationState;
+                var identityName = state.User.Identity?.Name;
+                if (identityName is not null)
+                {
+                    await UserService.GetUser(Guid.Parse(identityName));
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            await authenticationStateProvider.UpdateAuthenticationState(null);
+            NavigationManager.NavigateTo("/", true);
+        }
+    }
+
+
+    private async Task Logout()
+    {
+        var authenticationProvider = (SimpleAuthenticationStateProvider)_authenticationStateProvider;
+        await authenticationProvider.UpdateAuthenticationState(null);
+        _navigationManager.NavigateTo("/", true);
+    }
+
+}

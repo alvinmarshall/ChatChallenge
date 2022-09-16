@@ -22,7 +22,7 @@ public class ChatServiceTest
         var roomName = "Test-Room";
         var userId = Guid.Parse("9788A3CD-752A-4D69-A77F-494F5C917A6A");
 
-        _chatRoomServiceMock.Setup(service => service.GetRoomBySecret(roomSecret))
+        _chatRoomServiceMock.Setup(service => service.GetRoomById(roomId))
             .ReturnsAsync(() => new ChatRoom { Id = roomId, Name = roomName, Secret = roomSecret });
 
 
@@ -30,7 +30,7 @@ public class ChatServiceTest
         var messageDto = new ChatRoomMessageDto()
         {
             Message = "/stock=AAPL.US",
-            Secret = roomSecret,
+            RoomId = roomId,
             UserId = userId
         };
         var hubDto = await _sut.ParseMessage(messageDto);
@@ -46,7 +46,7 @@ public class ChatServiceTest
         var roomName = "Test-Room";
         var userId = Guid.Parse("9788A3CD-752A-4D69-A77F-494F5C917A6A");
 
-        _chatRoomServiceMock.Setup(service => service.GetRoomBySecret(roomSecret))
+        _chatRoomServiceMock.Setup(service => service.GetRoomById(roomId))
             .ReturnsAsync(() => new ChatRoom { Id = roomId, Name = roomName, Secret = roomSecret });
 
 
@@ -54,7 +54,7 @@ public class ChatServiceTest
         var messageDto = new ChatRoomMessageDto()
         {
             Message = "/stock",
-            Secret = roomSecret,
+            RoomId = roomId,
             UserId = userId
         };
         var hubDto = await _sut.ParseMessage(messageDto);
@@ -71,7 +71,7 @@ public class ChatServiceTest
         var userId = Guid.Parse("9788A3CD-752A-4D69-A77F-494F5C917A6A");
         var userName = "Test-User-Name";
 
-        _chatRoomServiceMock.Setup(service => service.GetRoomBySecret(roomSecret))
+        _chatRoomServiceMock.Setup(service => service.GetRoomById(roomId))
             .ReturnsAsync(() => new ChatRoom { Id = roomId, Name = roomName, Secret = roomSecret });
 
         _chatRoomServiceMock.Setup(service => service.SaveMessage(It.IsAny<ChatRoomMessageDto>()))
@@ -90,7 +90,7 @@ public class ChatServiceTest
         var messageDto = new ChatRoomMessageDto()
         {
             Message = "Test-Message",
-            Secret = roomSecret,
+            RoomId = roomId,
             UserId = userId
         };
         var hubDto = await _sut.ParseMessage(messageDto);

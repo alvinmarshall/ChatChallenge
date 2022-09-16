@@ -16,5 +16,9 @@ public class ChatAppContext : DbContext, IChatAppContext
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        builder.Entity<RoomEntity>()
+            .HasMany(r => r.Users)
+            .WithMany(u => u.Rooms);
+
     }
 }
